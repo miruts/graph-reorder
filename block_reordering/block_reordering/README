@@ -1,0 +1,14 @@
+block reordering -> spatio-temporal optimization
+Steps to run
+
+1. make
+2. ./a.out (optinal arguments){cache_line_size, cache_capacity} <inputGraphFileName> <outputFileName>
+
+input graph file is an edge list reoredered by Gorder algorithm. Each line in edge lists indicate an edge
+between 2 node indices sepearated by tab or space
+GOrder algorithm can be found at:
+https://github.com/datourat/Gorder
+
+output is a binary CSR file which contains 2 integers - <numberOfVertices> <numberOfEdges>
+followed by CSR matrix (complete Vertex Array followed by complete EDge array).
+For details on CSR format, look at Boost CSR webpage.

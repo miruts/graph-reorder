@@ -1,0 +1,11 @@
+pH reordering -> temporal only
+Steps to run
+
+1. make
+2. ./a.out <inputGraphFileName> <outputFileName>
+
+input graph file is an edge list with each line indicating an edge between 2 node indices sepearated by tab or space
+
+output is a binary CSR file which contains 2 integers - <numberOfVertices> <numberOfEdges>
+followed by CSR matrix (complete Vertex Array followed by complete EDge array).
+For details on CSR format, look at Boost CSR webpage.

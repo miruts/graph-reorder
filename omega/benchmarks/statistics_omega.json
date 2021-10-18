@@ -1,0 +1,3435 @@
+
+pH Reordering: {
+
+	pagerank: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull runtime: 0.043490 ms
+
+				push runtime: 0.053470 ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.003553 ms
+
+				push runtime: 0.003031 ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull runtime: 0.031917 ms
+
+				push runtime: 0.038732 ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.002472 ms
+
+				push runtime: 0.001910 ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull runtime: 0.011118 ms
+
+				push runtime: 0.014983 ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.000838 ms
+
+				push runtime: 0.000793 ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull runtime: 0.004002 ms
+
+				push runtime: 0.005197 ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.000292 ms
+
+				push runtime: 0.000271 ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+	}
+
+	cc: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull runtime: 0.229008 ms
+
+				push runtime: 0.056364 ms
+
+				push-pull runtime: 0.086650 ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.019603 ms
+
+				push runtime: 0.005986 ms
+
+				push-pull runtime: 0.007568 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull runtime: 0.304391 ms
+
+				push runtime: 0.074484 ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.023802 ms
+
+				push runtime: 0.006982 ms
+
+				push-pull runtime: 0.011647 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull runtime: 0.022183 ms
+
+				push runtime:  ms
+
+				push-pull runtime: 0.015986 ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.001597 ms
+
+				push runtime: 0.001262 ms
+
+				push-pull runtime: 0.001093 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull runtime: 0.007510 ms
+
+				push runtime: 0.005625 ms
+
+				push-pull runtime: 0.006561 ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.000461 ms
+
+				push runtime: 0.000551 ms
+
+				push-pull runtime: 0.000423 ms
+
+			}
+		}
+	}
+
+	bfs: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull runtime: 0.122502 ms
+
+				push runtime: 0.022498 ms
+
+				push-pull runtime: 0.041684 ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime: 0.002438 ms
+
+				push-pull runtime: 0.004149 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull runtime: 0.200581 ms
+
+				push runtime:  ms
+
+				push-pull runtime: 0.062455 ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime: 0.002355 ms
+
+				push-pull runtime: 0.005096 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull runtime: 0.010651 ms
+
+				push runtime: 0.009993 ms
+
+				push-pull runtime: 0.005323 ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime: 0.000894 ms
+
+				push-pull runtime: 0.000557 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull runtime: 0.001166 ms
+
+				push runtime: 0.000359 ms
+
+				push-pull runtime: 0.000353 ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime: 0.000021 ms
+
+				push-pull runtime: 0.000021 ms
+
+			}
+		}
+	}
+
+	sssp: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull runtime: 0.295477 ms
+
+				push runtime: 0.067098 ms
+
+				push-pull runtime: 0.168477 ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.022881 ms
+
+				push runtime: 0.006372 ms
+
+				push-pull runtime: 0.014295 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull runtime: 0.457383 ms
+
+				push runtime: 0.079416 ms
+
+				push-pull runtime: 0.199607 ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.033061 ms
+
+				push runtime: 0.006091 ms
+
+				push-pull runtime: 0.015065 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull runtime: 0.072573 ms
+
+				push runtime: 0.024640 ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.005549 ms
+
+				push runtime: 0.002699 ms
+
+				push-pull runtime: 0.004331 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull runtime: 0.001040 ms
+
+				push runtime: 0.000222 ms
+
+				push-pull runtime: 0.000221 ms
+
+			}
+
+			executables_16: {
+				pull runtime: 0.000090 ms
+
+				push runtime: 0.000020 ms
+
+				push-pull runtime: 0.000019 ms
+
+			}
+		}
+	}
+}
+
+Degree ordering: {
+
+	pagerank: {
+
+		web-NotreDame: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.042694 ms
+
+					push runtime: 0.054800 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.003654 ms
+
+					push runtime: 0.003098 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.043546 ms
+
+					push runtime: 0.052983 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.003607 ms
+
+					push runtime: 0.002987 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+		}
+
+		Amazon0302: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.028655 ms
+
+					push runtime: 0.038851 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.002232 ms
+
+					push runtime: 0.001928 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.031461 ms
+
+					push runtime: 0.038577 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.002471 ms
+
+					push runtime: 0.001873 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+		}
+
+		Slashdot0811: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.010800 ms
+
+					push runtime: 0.015070 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.000780 ms
+
+					push runtime: 0.000768 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.010990 ms
+
+					push runtime: 0.014591 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.000806 ms
+
+					push runtime: 0.000745 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+		}
+
+		CA-AstroPh: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.003966 ms
+
+					push runtime: 0.005133 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.000284 ms
+
+					push runtime: 0.000269 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.003964 ms
+
+					push runtime: 0.005133 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.000284 ms
+
+					push runtime: 0.000269 ms
+
+					push-pull runtime:  ms
+
+				}
+			}
+		}
+	}
+
+	cc: {
+
+		web-NotreDame: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.165706 ms
+
+					push runtime: 0.062362 ms
+
+					push-pull runtime: 0.085381 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.018805 ms
+
+					push runtime: 0.006707 ms
+
+					push-pull runtime: 0.008973 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.209363 ms
+
+					push runtime: 0.055523 ms
+
+					push-pull runtime: 0.082706 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.018860 ms
+
+					push runtime: 0.006011 ms
+
+					push-pull runtime: 0.007184 ms
+
+				}
+			}
+		}
+
+		Amazon0302: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.264628 ms
+
+					push runtime: 0.085218 ms
+
+					push-pull runtime: 0.157118 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.021816 ms
+
+					push runtime: 0.007695 ms
+
+					push-pull runtime: 0.012593 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.120579 ms
+
+					push runtime: 0.032832 ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.018103 ms
+
+					push runtime: 0.004719 ms
+
+					push-pull runtime: 0.005618 ms
+
+				}
+			}
+		}
+
+		Slashdot0811: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.020779 ms
+
+					push runtime: 0.013827 ms
+
+					push-pull runtime: 0.015683 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.001336 ms
+
+					push runtime: 0.001269 ms
+
+					push-pull runtime: 0.001031 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.021420 ms
+
+					push runtime: 0.013568 ms
+
+					push-pull runtime: 0.015793 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.001397 ms
+
+					push runtime: 0.001254 ms
+
+					push-pull runtime: 0.001072 ms
+
+				}
+			}
+		}
+
+		CA-AstroPh: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.008669 ms
+
+					push runtime: 0.005589 ms
+
+					push-pull runtime: 0.006553 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.000604 ms
+
+					push runtime: 0.000556 ms
+
+					push-pull runtime: 0.000432 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.008681 ms
+
+					push runtime: 0.005599 ms
+
+					push-pull runtime: 0.006562 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.000605 ms
+
+					push runtime: 0.000548 ms
+
+					push-pull runtime: 0.000431 ms
+
+				}
+			}
+		}
+	}
+
+	bfs: {
+
+		web-NotreDame: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.115996 ms
+
+					push runtime: 0.022600 ms
+
+					push-pull runtime: 0.037420 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.002428 ms
+
+					push-pull runtime: 0.004018 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.119428 ms
+
+					push runtime: 0.022582 ms
+
+					push-pull runtime: 0.038264 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.002417 ms
+
+					push-pull runtime: 0.003922 ms
+
+				}
+			}
+		}
+
+		Amazon0302: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.166905 ms
+
+					push runtime:  ms
+
+					push-pull runtime: 0.053020 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.002324 ms
+
+					push-pull runtime: 0.004648 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.195466 ms
+
+					push runtime:  ms
+
+					push-pull runtime: 0.057366 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.002295 ms
+
+					push-pull runtime: 0.004937 ms
+
+				}
+			}
+		}
+
+		Slashdot0811: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.009725 ms
+
+					push runtime: 0.009954 ms
+
+					push-pull runtime: 0.004432 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.000891 ms
+
+					push-pull runtime: 0.000499 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.010038 ms
+
+					push runtime: 0.009895 ms
+
+					push-pull runtime: 0.004494 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.000872 ms
+
+					push-pull runtime: 0.000508 ms
+
+				}
+			}
+		}
+
+		CA-AstroPh: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.005339 ms
+
+					push runtime: 0.004007 ms
+
+					push-pull runtime: 0.001734 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.000495 ms
+
+					push-pull runtime: 0.000315 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.005380 ms
+
+					push runtime: 0.003994 ms
+
+					push-pull runtime: 0.001789 ms
+
+				}
+
+				executables_16: {
+					pull runtime:  ms
+
+					push runtime: 0.000503 ms
+
+					push-pull runtime: 0.000320 ms
+
+				}
+			}
+		}
+	}
+
+	sssp: {
+
+		web-NotreDame: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.259634 ms
+
+					push runtime: 0.062455 ms
+
+					push-pull runtime: 0.147332 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.026331 ms
+
+					push runtime: 0.006671 ms
+
+					push-pull runtime: 0.015383 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.292404 ms
+
+					push runtime:  ms
+
+					push-pull runtime:  ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.022181 ms
+
+					push runtime: 0.006743 ms
+
+					push-pull runtime: 0.013831 ms
+
+				}
+			}
+		}
+
+		Amazon0302: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.363107 ms
+
+					push runtime: 0.081508 ms
+
+					push-pull runtime: 0.179945 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.027802 ms
+
+					push runtime: 0.005964 ms
+
+					push-pull runtime: 0.013572 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.454298 ms
+
+					push runtime: 0.077450 ms
+
+					push-pull runtime: 0.195549 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.032652 ms
+
+					push runtime: 0.005774 ms
+
+					push-pull runtime: 0.014478 ms
+
+				}
+			}
+		}
+
+		Slashdot0811: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.067216 ms
+
+					push runtime: 0.025247 ms
+
+					push-pull runtime: 0.049477 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.005470 ms
+
+					push runtime: 0.002659 ms
+
+					push-pull runtime: 0.004528 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.067036 ms
+
+					push runtime: 0.025196 ms
+
+					push-pull runtime: 0.047406 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.005558 ms
+
+					push runtime: 0.002921 ms
+
+					push-pull runtime: 0.004250 ms
+
+				}
+			}
+		}
+
+		CA-AstroPh: {
+			indegree: {
+
+				executables_1: {
+					pull runtime: 0.030525 ms
+
+					push runtime: 0.016499 ms
+
+					push-pull runtime: 0.021394 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.002423 ms
+
+					push runtime: 0.002028 ms
+
+					push-pull runtime: 0.003097 ms
+
+				}
+			}
+			outdegree: {
+
+				executables_1: {
+					pull runtime: 0.030614 ms
+
+					push runtime: 0.016421 ms
+
+					push-pull runtime: 0.021501 ms
+
+				}
+
+				executables_16: {
+					pull runtime: 0.002478 ms
+
+					push runtime: 0.001802 ms
+
+					push-pull runtime: 0.003335 ms
+
+				}
+			}
+		}
+	}
+}
+
+Clustering: {
+
+	pagerank: {
+
+		web-NotreDame: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Amazon0302: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Slashdot0811: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		CA-AstroPh: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+	}
+
+	cc: {
+
+		web-NotreDame: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Amazon0302: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Slashdot0811: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		CA-AstroPh: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+	}
+
+	bfs: {
+
+		web-NotreDame: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Amazon0302: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Slashdot0811: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		CA-AstroPh: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+	}
+
+	sssp: {
+
+		web-NotreDame: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Amazon0302: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		Slashdot0811: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+
+		CA-AstroPh: {
+
+			sort: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+
+			cluster: {
+
+				indegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+
+				outdegree: {
+
+					executables_1: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+
+					executables_16: {
+							pull runtime:  ms
+
+							push runtime:  ms
+
+							push-pull runtime:  ms
+
+					}
+				}
+			}
+		}
+	}
+
+Block Reordering: {
+
+	pagerank: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.043366 ms
+
+				push: 0.054475 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.003562 ms
+
+				push: 0.003054 ms
+
+				push-pull:  ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.031916 ms
+
+				push: 0.038509 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.002482 ms
+
+				push: 0.001967 ms
+
+				push-pull:  ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.011358 ms
+
+				push: 0.015540 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.000757 ms
+
+				push: 0.000758 ms
+
+				push-pull:  ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.004054 ms
+
+				push: 0.005270 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.000288 ms
+
+				push: 0.000277 ms
+
+				push-pull:  ms
+
+			}
+		}
+	}
+
+	cc: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.227340 ms
+
+				push: 0.081016 ms
+
+				push-pull: 0.101189 ms
+
+			}
+
+			executables_16: {
+				pull: 0.019867 ms
+
+				push: 0.007386 ms
+
+				push-pull: 0.009756 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.311149 ms
+
+				push: 0.074266 ms
+
+				push-pull: 0.141184 ms
+
+			}
+
+			executables_16: {
+				pull: 0.022955 ms
+
+				push: 0.007062 ms
+
+				push-pull: 0.011653 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.026604 ms
+
+				push: 0.014210 ms
+
+				push-pull: 0.019876 ms
+
+			}
+
+			executables_16: {
+				pull: 0.001470 ms
+
+				push: 0.001292 ms
+
+				push-pull: 0.001207 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.010816 ms
+
+				push: 0.005712 ms
+
+				push-pull: 0.008270 ms
+
+			}
+
+			executables_16: {
+				pull: 0.000707 ms
+
+				push: 0.000604 ms
+
+				push-pull: 0.000576 ms
+
+			}
+		}
+	}
+
+	bfs: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.119738 ms
+
+				push: 0.022484 ms
+
+				push-pull: 0.038424 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.002425 ms
+
+				push-pull: 0.003824 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.198110 ms
+
+				push: 0.019927 ms
+
+				push-pull: 0.058786 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.002322 ms
+
+				push-pull: 0.005012 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.010445 ms
+
+				push: 0.009982 ms
+
+				push-pull: 0.004642 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.000853 ms
+
+				push-pull: 0.000466 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.006016 ms
+
+				push: 0.004090 ms
+
+				push-pull: 0.002380 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.000490 ms
+
+				push-pull: 0.000344 ms
+
+			}
+		}
+	}
+
+	sssp: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.298696 ms
+
+				push: 0.060883 ms
+
+				push-pull: 0.157008 ms
+
+			}
+
+			executables_16: {
+				pull: 0.023283 ms
+
+				push: 0.006571 ms
+
+				push-pull: 0.013939 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.465181 ms
+
+				push: 0.078346 ms
+
+				push-pull: 0.201432 ms
+
+			}
+
+			executables_16: {
+				pull: 0.033348 ms
+
+				push: 0.005766 ms
+
+				push-pull: 0.014748 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.080719 ms
+
+				push: 0.024711 ms
+
+				push-pull: 0.053123 ms
+
+			}
+
+			executables_16: {
+				pull: 0.005665 ms
+
+				push: 0.002986 ms
+
+				push-pull: 0.004277 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.040141 ms
+
+				push: 0.015739 ms
+
+				push-pull: 0.038291 ms
+
+			}
+
+			executables_16: {
+				pull: 0.002537 ms
+
+				push: 0.001796 ms
+
+				push-pull: 0.002141 ms
+
+			}
+		}
+	}
+}
+
+Rabbit Reordering: {
+
+	pagerank: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.045111 ms
+
+				push: 0.055667 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.003833 ms
+
+				push: 0.003287 ms
+
+				push-pull:  ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.031743 ms
+
+				push: 0.038668 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.002509 ms
+
+				push: 0.001952 ms
+
+				push-pull:  ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.011453 ms
+
+				push: 0.015579 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.000767 ms
+
+				push: 0.000779 ms
+
+				push-pull:  ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.004062 ms
+
+				push: 0.005256 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.000297 ms
+
+				push: 0.000284 ms
+
+				push-pull:  ms
+
+			}
+		}
+	}
+
+	cc: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.261233 ms
+
+				push: 0.090855 ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.021721 ms
+
+				push: 0.007871 ms
+
+				push-pull: 0.009618 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.513479 ms
+
+				push:  ms
+
+				push-pull:  ms
+
+			}
+
+			executables_16: {
+				pull: 0.037848 ms
+
+				push: 0.011157 ms
+
+				push-pull: 0.026035 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.029589 ms
+
+				push: 0.014283 ms
+
+				push-pull: 0.022097 ms
+
+			}
+
+			executables_16: {
+				pull: 0.001799 ms
+
+				push: 0.001305 ms
+
+				push-pull: 0.001357 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.009536 ms
+
+				push: 0.005638 ms
+
+				push-pull: 0.007938 ms
+
+			}
+
+			executables_16: {
+				pull: 0.000638 ms
+
+				push: 0.000583 ms
+
+				push-pull: 0.000547 ms
+
+			}
+		}
+	}
+
+	bfs: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.124514 ms
+
+				push:  ms
+
+				push-pull: 0.043028 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.002470 ms
+
+				push-pull: 0.004153 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.196996 ms
+
+				push: 0.019928 ms
+
+				push-pull: 0.058054 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.002340 ms
+
+				push-pull: 0.004918 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.012076 ms
+
+				push: 0.010185 ms
+
+				push-pull: 0.006576 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.000879 ms
+
+				push-pull: 0.000596 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.005693 ms
+
+				push: 0.003962 ms
+
+				push-pull: 0.002041 ms
+
+			}
+
+			executables_16: {
+				pull:  ms
+
+				push: 0.000487 ms
+
+				push-pull: 0.000325 ms
+
+			}
+		}
+	}
+
+	sssp: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull: 0.311379 ms
+
+				push: 0.061519 ms
+
+				push-pull: 0.173779 ms
+
+			}
+
+			executables_16: {
+				pull: 0.024219 ms
+
+				push: 0.006498 ms
+
+				push-pull: 0.013978 ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull: 0.458996 ms
+
+				push: 0.064410 ms
+
+				push-pull: 0.199549 ms
+
+			}
+
+			executables_16: {
+				pull: 0.032572 ms
+
+				push: 0.005869 ms
+
+				push-pull: 0.016137 ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull: 0.090544 ms
+
+				push: 0.024417 ms
+
+				push-pull: 0.064339 ms
+
+			}
+
+			executables_16: {
+				pull: 0.006028 ms
+
+				push: 0.002871 ms
+
+				push-pull: 0.004249 ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull: 0.032052 ms
+
+				push: 0.012941 ms
+
+				push-pull: 0.025926 ms
+
+			}
+
+			executables_16: {
+				pull: 0.002857 ms
+
+				push: 0.001281 ms
+
+				push-pull: 0.002227 ms
+
+			}
+		}
+	}
+}
+
+Gorder reordering: {
+
+	pagerank: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+	}
+
+	cc: {
+
+		web-NotreDame: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		Amazon0302: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		Slashdot0811: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+
+		CA-AstroPh: {
+
+			executables_1: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+
+			executables_16: {
+				pull runtime:  ms
+
+				push runtime:  ms
+
+				push-pull runtime:  ms
+
+			}
+		}
+	}
+}

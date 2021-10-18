@@ -11,6 +11,6 @@ This readme provides how to use and run different reordering methods, test reord
 ## Reordering
 Each Folder contains how to run or use reordering method, script, and tools
 
-PS. reordering methods, or scripts should not be run in parallel because they use the same temp file for loggin runtimes and could cause trouble
+PS. reordering methods, or scripts should not be run in parallel because they use the same temp file for logging runtimes and could cause trouble.
 
 

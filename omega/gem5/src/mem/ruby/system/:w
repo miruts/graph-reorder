@@ -1,0 +1,1549 @@
+/*
+ * Copyright (c) 1999-2008 Mark D. Hill and David A. Wood
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met: redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer;
+ * redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution;
+ * neither the name of the copyright holders nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include "arch/x86/ldstflags.hh"
+#include "base/misc.hh"
+#include "base/str.hh"
+#include "cpu/testers/rubytest/RubyTester.hh"
+#include "debug/MemoryAccess.hh"
+#include "debug/ProtocolTrace.hh"
+#include "debug/RubySequencer.hh"
+#include "debug/RubyStats.hh"
+#include "mem/protocol/PrefetchBit.hh"
+#include "mem/protocol/RubyAccessMode.hh"
+#include "mem/ruby/profiler/Profiler.hh"
+#include "mem/ruby/slicc_interface/RubyRequest.hh"
+#include "mem/ruby/system/RubySystem.hh"
+#include "mem/ruby/system/Sequencer.hh"
+#include "mem/packet.hh"
+#include "sim/system.hh"
+
+#include "mem/page_table.hh"
+#include "arch/generic/tlb.hh"
+
+using namespace std;
+
+Sequencer *
+RubySequencerParams::create()
+{
+    return new Sequencer(this);
+}
+
+Sequencer::Sequencer(const Params *p)
+    : RubyPort(p), m_IncompleteTimes(MachineType_NUM), deadlockCheckEvent(this)
+{
+    m_outstanding_count = 0;
+
+    m_instCache_ptr = p->icache;
+    m_dataCache_ptr = p->dcache;
+    m_vertexCache_ptr = p->vcache;
+    m_data_cache_hit_latency = p->dcache_hit_latency;
+    m_inst_cache_hit_latency = p->icache_hit_latency;
+    m_vertex_cache_hit_latency = p->vertex_hit_latency;
+    m_max_outstanding_requests = p->max_outstanding_requests;
+    m_deadlock_threshold = p->deadlock_threshold;
+
+    //Abraham - added
+    m_numCPU = p->numCPU;
+
+    configVertexStartAddr1 = p->configVertexStartAddr1;
+    configVertexStartAddr2 = p->configVertexStartAddr2;
+    configVertexStartAddr3 = p->configVertexStartAddr3;
+    configVertexStartAddr4 = p->configVertexStartAddr4;
+    configDataTypeSize1 = p->configDataTypeSize1;
+    configDataTypeSize2 = p->configDataTypeSize2;
+    configDataTypeSize3 = p->configDataTypeSize3;
+    configDataTypeSize4 = p->configDataTypeSize4;
+    configEnableTrackedAddr1 = p->configEnableTrackedAddr1;
+    configEnableTrackedAddr2 = p->configEnableTrackedAddr2;
+    configEnableTrackedAddr3 = p->configEnableTrackedAddr3;
+    configEnableTrackedAddr4 = p->configEnableTrackedAddr4;
+
+    configNumVertex = p->configNumVertex; 
+    
+    configStride1 = p->configStride1;
+    configStride2 = p->configStride2;
+    configStride3 = p->configStride3;
+    configStride4 = p->configStride4;
+
+    configEnablePrefetch = p->configEnablePrefetch;
+    configPrefetchAddr = p->configPrefetchAddr;
+    configPrefetchSize = p->configPrefetchSize;
+
+    configOldValueAddr1 = p->configOldValueAddr1;
+    configOldValueAddr2 = p->configOldValueAddr2;
+    configAtomicStatusAddr1 = p->configAtomicStatusAddr1;
+    configAtomicStatusAddr2 = p->configAtomicStatusAddr2;
+    configEnableAtomicAddr = p->configEnableAtomicAddr; 
+    
+    configAtomicOppTypeAddr1 = p->configAtomicOppTypeAddr1; 
+    configAtomicOppTypeAddr2 = p->configAtomicOppTypeAddr2; 
+    
+    
+    assert(m_max_outstanding_requests > 0);
+    assert(m_deadlock_threshold > 0);
+    assert(m_instCache_ptr != NULL);
+    assert(m_dataCache_ptr != NULL);
+    assert(m_vertexCache_ptr != NULL);
+    assert(m_data_cache_hit_latency > 0);
+    assert(m_inst_cache_hit_latency > 0);
+
+    m_usingNetworkTester = p->using_network_tester;
+}
+
+Sequencer::~Sequencer()
+{
+}
+
+void
+Sequencer::wakeup()
+{
+    assert(drainState() != DrainState::Draining);
+
+    // Check for deadlock of any of the requests
+    Cycles current_time = curCycle();
+
+    // Check across all outstanding requests
+    int total_outstanding = 0;
+
+    RequestTable::iterator read = m_readRequestTable.begin();
+    RequestTable::iterator read_end = m_readRequestTable.end();
+    for (; read != read_end; ++read) {
+        SequencerRequest* request = read->second;
+       
+       
+       //DPRINTF(RubySequencer, "RRT p %#x v %#x size: %d\n", request->pkt->getAddr(), request->pkt->getVaddr(), m_readRequestTable.size());
+		
+			 if (current_time - request->issue_time < m_deadlock_threshold)
+			 	continue;
+			
+        
+        
+        panic("Possible Deadlock detected. Aborting!\n"
+              //"version: %d request.paddr: 0x%x request.vaddr: 0x%x m_readRequestTable: %d "
+              "version: %d request.paddr: 0x%x request.vaddr: 0x%x m_readRequestTable: %d "
+              "current time: %u issue_time: %d difference: %d\n", m_version,
+              request->pkt->getAddr(), request->pkt->getVaddr(), m_readRequestTable.size(),
+              current_time * clockPeriod(), request->issue_time * clockPeriod(),
+              (current_time * clockPeriod()) - (request->issue_time * clockPeriod()));
+						
+    
+    
+    }
+
+    RequestTable::iterator write = m_writeRequestTable.begin();
+    RequestTable::iterator write_end = m_writeRequestTable.end();
+    for (; write != write_end; ++write) {
+        SequencerRequest* request = write->second;
+        
+				if (current_time - request->issue_time < m_deadlock_threshold)
+				 	continue;
+	/*  
+    RequestTable::iterator read_tmp = m_readRequestTable.begin();
+    RequestTable::iterator read_end_tmp = m_readRequestTable.end();
+
+      for (; read_tmp != read_end_tmp; ++read_tmp) {
+        SequencerRequest* request_tmp = read_tmp->second;
+        
+        DPRINTF(RubySequencer, "RRT p %#x v %#x size: %d\n", request_tmp->pkt->getAddr(), request_tmp->pkt->getVaddr(), m_readRequestTable.size());
+      }
+        DPRINTF(RubySequencer, "WRT p %#x v %#x size: %d\n", request->pkt->getAddr(), request->pkt->getVaddr(), m_writeRequestTable.size());
+     */   
+        panic("Possible Deadlock detected. Aborting!\n"
+              "version: %d request.paddr: 0x%x request.vaddr: 0x%x m_writeRequestTable: %d "
+              "current time: %u issue_time: %d difference: %d\n", m_version,
+              request->pkt->getAddr(), request->pkt->getVaddr(), m_writeRequestTable.size(),
+              current_time * clockPeriod(), request->issue_time * clockPeriod(),
+              (current_time * clockPeriod()) - (request->issue_time * clockPeriod()));
+							
+    }
+
+    total_outstanding += m_writeRequestTable.size();
+    total_outstanding += m_readRequestTable.size();
+
+    assert(m_outstanding_count == total_outstanding);
+
+    if (m_outstanding_count > 0) {
+        // If there are still outstanding requests, keep checking
+        schedule(deadlockCheckEvent, clockEdge(m_deadlock_threshold));
+    }
+}
+
+void Sequencer::resetStats()
+{
+    m_latencyHist.reset();
+    m_hitLatencyHist.reset();
+    m_missLatencyHist.reset();
+    for (int i = 0; i < RubyRequestType_NUM; i++) {
+        m_typeLatencyHist[i]->reset();
+        m_hitTypeLatencyHist[i]->reset();
+        m_missTypeLatencyHist[i]->reset();
+        for (int j = 0; j < MachineType_NUM; j++) {
+            m_hitTypeMachLatencyHist[i][j]->reset();
+            m_missTypeMachLatencyHist[i][j]->reset();
+        }
+    }
+
+    for (int i = 0; i < MachineType_NUM; i++) {
+        m_missMachLatencyHist[i]->reset();
+        m_hitMachLatencyHist[i]->reset();
+
+        m_IssueToInitialDelayHist[i]->reset();
+        m_InitialToForwardDelayHist[i]->reset();
+        m_ForwardToFirstResponseDelayHist[i]->reset();
+        m_FirstResponseToCompletionDelayHist[i]->reset();
+
+        m_IncompleteTimes[i] = 0;
+    }
+}
+
+// Insert the request on the correct request table.  Return true if
+// the entry was already present.
+RequestStatus
+Sequencer::insertRequest(PacketPtr pkt, RubyRequestType request_type)
+{
+    assert(m_outstanding_count ==
+        (m_writeRequestTable.size() + m_readRequestTable.size()));
+
+    // See if we should schedule a deadlock check
+    if (!deadlockCheckEvent.scheduled() &&
+        drainState() != DrainState::Draining) {
+        schedule(deadlockCheckEvent, clockEdge(m_deadlock_threshold));
+    }
+
+    Addr line_addr = makeLineAddress(pkt->getAddr());
+    
+    //line adddress is the same as getAddr for scratchpad accesses
+    if ((request_type == RubyRequestType_ST_Vertex_Local) ||
+        (request_type == RubyRequestType_ST_Vertex_Remote) ||
+        (request_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+        (request_type == RubyRequestType_Locked_Vertex_Read_Remote) ||
+        (request_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+        (request_type == RubyRequestType_Locked_Vertex_Write_Remote) ||
+        (request_type == RubyRequestType_LD_Vertex_Local) ||
+        (request_type == RubyRequestType_PREFETCH_EDGE) ||
+        (request_type == RubyRequestType_LD_Vertex_Remote)) {
+        //Abraham
+        //Comment out the following line to check atomicity at a cache-line granularity
+        line_addr = pkt->getAddr();
+
+    }
+    
+    // Create a default entry, mapping the address to NULL, the cast is
+    // there to make gcc 4.4 happy
+    RequestTable::value_type default_entry(line_addr,
+                                           (SequencerRequest*) NULL);
+   /* 
+    //Abraham - attempting to fix deadlock issue based on https://groups.google.com/forum/#!topic/gem5-gpu-dev/RQv4SxIKv7g
+    if (m_controller->isBlocked(line_addr) && 
+        (request_type == RubyRequestType_IFETCH)) {
+        return RequestStatus_Aliased;
+    }
+   */ 
+    
+    if ((request_type == RubyRequestType_ST) ||
+        (request_type == RubyRequestType_ST_Vertex_Local) ||
+        (request_type == RubyRequestType_ST_Vertex_Remote) ||
+        (request_type == RubyRequestType_RMW_Read) ||
+        (request_type == RubyRequestType_RMW_Write) ||
+        (request_type == RubyRequestType_Load_Linked) ||
+        (request_type == RubyRequestType_Store_Conditional) ||
+        (request_type == RubyRequestType_Locked_RMW_Read) ||
+        (request_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+        (request_type == RubyRequestType_Locked_Vertex_Read_Remote) ||
+        (request_type == RubyRequestType_Locked_RMW_Write) ||
+        (request_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+        (request_type == RubyRequestType_Locked_Vertex_Write_Remote) ||
+        (request_type == RubyRequestType_PREFETCH_EDGE) ||
+        (request_type == RubyRequestType_FLUSH)) {
+
+        // Check if there is any outstanding read request for the same
+        // cache line.
+        if (m_readRequestTable.count(line_addr) > 0) {
+            m_store_waiting_on_load++;
+            return RequestStatus_Aliased;
+        }
+
+        pair<RequestTable::iterator, bool> r =
+            m_writeRequestTable.insert(default_entry);
+        if (r.second) {
+            RequestTable::iterator i = r.first;
+            i->second = new SequencerRequest(pkt, request_type, curCycle());
+            m_outstanding_count++;
+        } else {
+          // There is an outstanding write request for the cache line
+          m_store_waiting_on_store++;
+          return RequestStatus_Aliased;
+        }
+    } else {
+        // Check if there is any outstanding write request for the same
+        // cache line.
+        if (m_writeRequestTable.count(line_addr) > 0) {
+            m_load_waiting_on_store++;
+            return RequestStatus_Aliased;
+        }
+
+        pair<RequestTable::iterator, bool> r =
+            m_readRequestTable.insert(default_entry);
+
+        if (r.second) {
+            RequestTable::iterator i = r.first;
+            i->second = new SequencerRequest(pkt, request_type, curCycle());
+            m_outstanding_count++;
+        } else {
+            // There is an outstanding read request for the cache line
+            m_load_waiting_on_load++;
+            return RequestStatus_Aliased;
+        }
+    }
+
+    m_outstandReqHist.sample(m_outstanding_count);
+    assert(m_outstanding_count ==
+        (m_writeRequestTable.size() + m_readRequestTable.size()));
+    
+    DPRINTF(RubySequencer, "Request is ready vaddr :%x\n", line_addr);
+
+    return RequestStatus_Ready;
+}
+
+void
+Sequencer::markRemoved()
+{
+    m_outstanding_count--;
+    assert(m_outstanding_count ==
+           m_writeRequestTable.size() + m_readRequestTable.size());
+}
+
+void
+Sequencer::invalidateSC(Addr address)
+{
+    DPRINTF(RubySequencer, "InvalidateSC :%x\n", address);
+    AbstractCacheEntry *e = m_dataCache_ptr->lookup(address);
+    // The controller has lost the coherence permissions, hence the lock
+    // on the cache line maintained by the cache should be cleared.
+    if (e && e->isLocked(m_version)) {
+        e->clearLocked();
+    }
+}
+
+bool
+Sequencer::handleLlsc(Addr address, SequencerRequest* request)
+{
+    DPRINTF(RubySequencer, "HandleLlsc is called:%x\n", address);
+    AbstractCacheEntry *e = m_dataCache_ptr->lookup(address);
+    if (!e)
+        return true;
+
+    // The success flag indicates whether the LLSC operation was successful.
+    // LL ops will always succeed, but SC may fail if the cache line is no
+    // longer locked.
+    bool success = true;
+    if (request->m_type == RubyRequestType_Store_Conditional) {
+        DPRINTF(RubySequencer, "HandleLlsc Store_Conditional called:%x\n", address);
+        if (!e->isLocked(m_version)) {
+            //
+            // For failed SC requests, indicate the failure to the cpu by
+            // setting the extra data to zero.
+            //
+            request->pkt->req->setExtraData(0);
+            success = false;
+        } else {
+            //
+            // For successful SC requests, indicate the success to the cpu by
+            // setting the extra data to one.
+            //
+            request->pkt->req->setExtraData(1);
+        }
+        //
+        // Independent of success, all SC operations must clear the lock
+        //
+        e->clearLocked();
+    } else if (request->m_type == RubyRequestType_Load_Linked) {
+        DPRINTF(RubySequencer, "HandleLlsc  Load_Linked called:%x\n", address);
+        //
+        // Note: To fully follow Alpha LLSC semantics, should the LL clear any
+        // previously locked cache lines?
+        //
+        e->setLocked(m_version);
+    } else if (e->isLocked(m_version)) {
+        DPRINTF(RubySequencer, "HandleLlsc  isLocked called:%x\n", address);
+        //
+        // Normal writes should clear the locked address
+        //
+        e->clearLocked();
+    }
+    return success;
+}
+
+void
+Sequencer::recordMissLatency(const Cycles cycles, const RubyRequestType type,
+                             const MachineType respondingMach,
+                             bool isExternalHit, Cycles issuedTime,
+                             Cycles initialRequestTime,
+                             Cycles forwardRequestTime,
+                             Cycles firstResponseTime, Cycles completionTime)
+{
+    m_latencyHist.sample(cycles);
+    m_typeLatencyHist[type]->sample(cycles);
+
+    if (isExternalHit) {
+        m_missLatencyHist.sample(cycles);
+        m_missTypeLatencyHist[type]->sample(cycles);
+
+        if (respondingMach != MachineType_NUM) {
+            m_missMachLatencyHist[respondingMach]->sample(cycles);
+            m_missTypeMachLatencyHist[type][respondingMach]->sample(cycles);
+
+            if ((issuedTime <= initialRequestTime) &&
+                (initialRequestTime <= forwardRequestTime) &&
+                (forwardRequestTime <= firstResponseTime) &&
+                (firstResponseTime <= completionTime)) {
+
+                m_IssueToInitialDelayHist[respondingMach]->sample(
+                    initialRequestTime - issuedTime);
+                m_InitialToForwardDelayHist[respondingMach]->sample(
+                    forwardRequestTime - initialRequestTime);
+                m_ForwardToFirstResponseDelayHist[respondingMach]->sample(
+                    firstResponseTime - forwardRequestTime);
+                m_FirstResponseToCompletionDelayHist[respondingMach]->sample(
+                    completionTime - firstResponseTime);
+            } else {
+                m_IncompleteTimes[respondingMach]++;
+            }
+        }
+    } else {
+        m_hitLatencyHist.sample(cycles);
+        m_hitTypeLatencyHist[type]->sample(cycles);
+
+        if (respondingMach != MachineType_NUM) {
+            m_hitMachLatencyHist[respondingMach]->sample(cycles);
+            m_hitTypeMachLatencyHist[type][respondingMach]->sample(cycles);
+        }
+    }
+}
+
+//Abraham - handling nonpointer based datablock access
+void
+Sequencer::writeCallback(Addr address, const DataBlock& data,
+                         const bool externalHit,
+                         const int offset,
+                         const MachineType mach,
+                         const Cycles initialRequestTime,
+                         const Cycles forwardRequestTime,
+                         const Cycles firstResponseTime)
+{
+
+    writeCallback(address, const_cast<DataBlock&>(data), true);
+
+}
+
+
+void
+Sequencer::writeCallback(Addr address, DataBlock& data,
+                         const bool externalHit, 
+                         const int offset,
+                         const MachineType mach,
+                         const Cycles initialRequestTime,
+                         const Cycles forwardRequestTime,
+                         const Cycles firstResponseTime)
+{
+    RequestTable::iterator i = m_writeRequestTable.find(address);
+    assert(i != m_writeRequestTable.end());
+    SequencerRequest* request = i->second;
+
+    //Abraham - the folowing distiniction allows to block on word-level
+    //address rather than cache-line-level address
+    if((request->m_type == RubyRequestType_ST_Vertex_Local) ||
+        (request->m_type == RubyRequestType_ST_Vertex_Remote) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Read_Remote) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Write_Remote) ||
+        (request->m_type == RubyRequestType_PREFETCH_EDGE)) {
+        
+        assert(m_writeRequestTable.count(address));
+    
+    }
+    else {
+        assert(address == makeLineAddress(address));
+        assert(m_writeRequestTable.count(makeLineAddress(address)));
+    }
+
+
+    
+    m_writeRequestTable.erase(i);
+    markRemoved();
+
+    assert((request->m_type == RubyRequestType_ST) ||
+           (request->m_type == RubyRequestType_ST_Vertex_Local) ||
+           (request->m_type == RubyRequestType_ST_Vertex_Remote) ||
+           (request->m_type == RubyRequestType_ATOMIC) ||
+           (request->m_type == RubyRequestType_RMW_Read) ||
+           (request->m_type == RubyRequestType_RMW_Write) ||
+           (request->m_type == RubyRequestType_Load_Linked) ||
+           (request->m_type == RubyRequestType_Store_Conditional) ||
+           (request->m_type == RubyRequestType_Locked_RMW_Read) ||
+           (request->m_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+           (request->m_type == RubyRequestType_Locked_Vertex_Read_Remote) ||
+           (request->m_type == RubyRequestType_Locked_RMW_Write) ||
+           (request->m_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+           (request->m_type == RubyRequestType_Locked_Vertex_Write_Remote) ||
+           (request->m_type == RubyRequestType_PREFETCH_EDGE) ||
+           (request->m_type == RubyRequestType_FLUSH));
+
+    //
+    // For Alpha, properly handle LL, SC, and write requests with respect to
+    // locked cache blocks.
+    //
+    // Not valid for Network_test protocl
+    //
+    bool success = true;
+    
+    DPRINTF(RubySequencer, "From writeback Address %#x \n", address);
+    //Abraham - the following lines don't get checked by in the !usingNetworkTester if clause
+    if((request->m_type == RubyRequestType_ST_Vertex_Local) ||
+        (request->m_type == RubyRequestType_ST_Vertex_Remote) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Read_Remote) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+        (request->m_type == RubyRequestType_Locked_Vertex_Write_Remote) ||
+        (request->m_type == RubyRequestType_PREFETCH_EDGE)) { 
+       
+       //do nothing
+       success = true;
+    
+    }
+    
+    
+    //if(!m_usingNetworkTester)
+    else if (!m_usingNetworkTester)
+        success = handleLlsc(address, request);
+
+    if ((request->m_type == RubyRequestType_Locked_RMW_Read)) {
+        m_controller->blockOnQueue(address, m_mandatory_q_ptr);
+        DPRINTF(RubySequencer, "blockonqueue: block read Address %#x \n", address);
+    }
+   else if ((request->m_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+            (request->m_type == RubyRequestType_Locked_Vertex_Read_Remote)) {
+
+   //else if ((request->m_type == RubyRequestType_Locked_Vertex_Read_Local)) {
+        m_controller->blockOnQueue(address, m_mandatory_q_ptr);
+        DPRINTF(RubySequencer, "blockonqueue: block vertex read local Address %#x \n", address);
+        //m_controller->blockOnQueue(request->pkt->getAddr(), m_mandatory_q_ptr);
+    }
+    else if ((request->m_type == RubyRequestType_Locked_RMW_Write)){
+        m_controller->unblock(address);
+        DPRINTF(RubySequencer, "blockonqueue: unblock write Address %#x \n", address);
+    } 
+    else if ((request->m_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+               (request->m_type == RubyRequestType_Locked_Vertex_Write_Remote)) {
+
+    //else if ((request->m_type == RubyRequestType_Locked_Vertex_Write_Local)) {
+        m_controller->unblock(address);
+        DPRINTF(RubySequencer, "blockonqueue: unblock vertex  write local Address %#x \n", address);
+    }
+
+    hitCallback(request, data, offset, success, mach, externalHit,
+                initialRequestTime, forwardRequestTime, firstResponseTime);
+}
+
+//Abraham - handling nonpointer based datablk access
+void
+Sequencer::readCallback(Addr address, const DataBlock& data,
+                        bool externalHit, 
+                        const int offset, 
+                        const MachineType mach,
+                        Cycles initialRequestTime,
+                        Cycles forwardRequestTime,
+                        Cycles firstResponseTime)
+{
+    
+    
+    readCallback(address, const_cast<DataBlock&>(data), true, offset);
+
+}
+
+void
+Sequencer::readCallback(Addr address, DataBlock& data,
+                        bool externalHit, 
+                        const int offset, 
+                        const MachineType mach,
+                        Cycles initialRequestTime,
+                        Cycles forwardRequestTime,
+                        Cycles firstResponseTime)
+{
+ 
+    DPRINTF(RubySequencer, "readcallback Physical Address %#x\n", address);
+
+    RequestTable::iterator i = m_readRequestTable.find(address);
+    assert(i != m_readRequestTable.end());
+    SequencerRequest* request = i->second;
+    //Abraham - scratchpad mapped addresses are handled separetly
+    if((request->m_type == RubyRequestType_LD_Vertex_Local) ||
+        (request->m_type == RubyRequestType_LD_Vertex_Remote)) {
+        
+        assert(m_readRequestTable.count(address));
+    }
+    else {
+        assert(address == makeLineAddress(address));
+        assert(m_readRequestTable.count(makeLineAddress(address)));
+    }
+   
+    m_readRequestTable.erase(i);
+    markRemoved();
+
+
+    assert((request->m_type == RubyRequestType_LD) ||
+           (request->m_type == RubyRequestType_LD_Vertex_Local) ||
+           (request->m_type == RubyRequestType_LD_Vertex_Remote) ||
+           (request->m_type == RubyRequestType_IFETCH));
+
+    hitCallback(request, data, offset, true, mach, externalHit,
+                initialRequestTime, forwardRequestTime, firstResponseTime);
+}
+
+void
+Sequencer::hitCallback(SequencerRequest* srequest, DataBlock& data,
+                       int offset,
+                       bool llscSuccess,
+                       const MachineType mach, const bool externalHit,
+                       const Cycles initialRequestTime,
+                       const Cycles forwardRequestTime,
+                       const Cycles firstResponseTime)
+{
+    warn_once("Replacement policy updates recently became the responsibility "
+              "of SLICC state machines. Make sure to setMRU() near callbacks "
+              "in .sm files!");
+
+    PacketPtr pkt = srequest->pkt;
+    Addr request_address(pkt->getAddr());
+    RubyRequestType type = srequest->m_type;
+    Cycles issued_time = srequest->issue_time;
+
+    assert(curCycle() >= issued_time);
+    Cycles total_latency = curCycle() - issued_time;
+
+    // Profile the latency for all demand accesses.
+    recordMissLatency(total_latency, type, mach, externalHit, issued_time,
+                      initialRequestTime, forwardRequestTime,
+                      firstResponseTime, curCycle());
+
+    DPRINTFR(ProtocolTrace, "%15s %3s %10s%20s %6s>%-6s %#x %d cycles\n",
+             curTick(), m_version, "Seq",
+             llscSuccess ? "Done" : "SC_Failed", "", "",
+             printAddress(request_address), total_latency);
+
+   
+    if (type == RubyRequestType_PREFETCH_EDGE) { //prefetch command does not have data
+        DPRINTF(RubySequencer, "Prefetch VAddress %#x , Physical Address %#x Value %#x\n", pkt->getVaddr(), pkt->getAddr(),(uint64_t)*(pkt->getConstPtr<uint64_t>()));
+    }
+    
+    // update the data unless it is a non-data-carrying flush
+    if (RubySystem::getWarmupEnabled()) {
+        data.setData(pkt->getConstPtr<uint8_t>(),
+                     getOffset(request_address), pkt->getSize());
+    } else if( (!pkt->isFlush()) && (type != RubyRequestType_ST_Vertex_Remote) && 
+               (type != RubyRequestType_Locked_Vertex_Write_Remote) && //already handled at the remote spd
+               (type != RubyRequestType_PREFETCH_EDGE)) { //prefetch command does not have data
+        DPRINTF(RubySequencer, "Here VAddress %#x , Physical Address %#x Value %#x\n", pkt->getVaddr(), pkt->getAddr(),(uint64_t)*(pkt->getConstPtr<uint64_t>()));
+        if ((type == RubyRequestType_LD_Vertex_Local) || //Read values
+            (type == RubyRequestType_Locked_Vertex_Read_Local)) {
+            //Abraham - 8 is the assumed maximum word length  
+            memcpy(pkt->getPtr<uint8_t>(),
+                   data.getData(offset*8, pkt->getSize()),
+                   pkt->getSize());
+            DPRINTF(RubySequencer, "vertex local read data %s\n", data);
+        }
+        else if ((type == RubyRequestType_LD_Vertex_Remote)) {
+            //Abraham - 8 is the assumed maximum word length  
+            memcpy(pkt->getPtr<uint8_t>(),
+                   data.getData(offset*8, pkt->getSize()),
+                   pkt->getSize());
+            DPRINTF(RubySequencer, "vertex remote read data %s\n", data);
+
+        }
+        else if ((type == RubyRequestType_Locked_Vertex_Read_Remote)) {
+            //Abraham - 8 is the assumed maximum word length  
+            memcpy(pkt->getPtr<uint8_t>(),
+                   data.getData(offset*8, pkt->getSize()),
+                   pkt->getSize());
+            DPRINTF(RubySequencer, "vertex remote locked read data %s\n", data);
+
+        }
+        else if ((type == RubyRequestType_LD) ||
+            (type == RubyRequestType_IFETCH) ||
+            (type == RubyRequestType_RMW_Read) ||
+            (type == RubyRequestType_Locked_RMW_Read) ||
+            (type == RubyRequestType_Load_Linked)) {
+            memcpy(pkt->getPtr<uint8_t>(),
+                   data.getData(getOffset(request_address), pkt->getSize()),
+                   pkt->getSize());
+            DPRINTF(RubySequencer, "read data %s\n", data);
+        }
+        //Abraham - note that RubyRequestType_Locked_Vertex_Write_Remote" is handled inside the protocol/scratchapd
+        else if ((type == RubyRequestType_ST_Vertex_Local) || 
+                (type == RubyRequestType_Locked_Vertex_Write_Local)) {
+            //Abraham - 8 bytes is the assumed maximum word length  
+            DPRINTF(RubySequencer, "vertex local set begin\n");
+            data.setData(pkt->getConstPtr<uint8_t>(),
+                         offset*8, pkt->getSize());
+            DPRINTF(RubySequencer, "vertex local set data %s\n", data);
+
+        } else {
+            data.setData(pkt->getConstPtr<uint8_t>(),
+                         getOffset(request_address), pkt->getSize());
+            DPRINTF(RubySequencer, "set data %s\n", data);
+        }
+    }
+
+    // If using the RubyTester, update the RubyTester sender state's
+    // subBlock with the recieved data.  The tester will later access
+    // this state.
+    if (m_usingRubyTester) {
+        DPRINTF(RubySequencer, "hitCallback %s 0x%x using RubyTester\n",
+                pkt->cmdString(), pkt->getAddr());
+        RubyTester::SenderState* testerSenderState =
+            pkt->findNextSenderState<RubyTester::SenderState>();
+        assert(testerSenderState);
+        testerSenderState->subBlock.mergeFrom(data);
+    }
+
+    delete srequest;
+
+    RubySystem *rs = m_ruby_system;
+    if (RubySystem::getWarmupEnabled()) {
+        assert(pkt->req);
+        delete pkt->req;
+        delete pkt;
+        rs->m_cache_recorder->enqueueNextFetchRequest();
+    } else if (RubySystem::getCooldownEnabled()) {
+        delete pkt;
+        rs->m_cache_recorder->enqueueNextFlushRequest();
+    } else {
+        ruby_hit_callback(pkt);
+    }
+}
+
+bool
+Sequencer::empty() const
+{
+    return m_writeRequestTable.empty() && m_readRequestTable.empty();
+}
+
+RequestStatus
+Sequencer::makeRequest(PacketPtr pkt)
+{
+    //Abraham - copying configuration parameters from the application
+    DPRINTF(RubySequencer, "VAddress %#x , PAddress %#x ,Value %#x\n", pkt->getVaddr(), pkt->getAddr(),(uint64_t)*(pkt->getConstPtr<uint64_t>()));
+    //int numSpdSets = m_vertexCache_ptr->getNumSets();
+    //int numLinesMapped =  (numVertex > numSpdSets*m_numCPU) ? numSpdSets*m_numCPU : numVertex;
+    //DPRINTF(RubySequencer, "Details of spec. numVertex: %i numSpdSets: %i numLinesMapped: %i stride1: %i  stride2: %i dataTypesize1: %i dataTypesize2: %i dataTypeSize3: %i\n", 
+     //       numVertex, numSpdSets, numLinesMapped, stride1, stride2, dataTypeSize1, dataTypeSize2, dataTypeSize3);
+    DPRINTF(RubySequencer, "Adddr current pkt: %#x stored addr1: %#x addr2 %#x addr3: %#x \n", pkt->getVaddr(), vertexStartAddr1, vertexStartAddr2, vertexStartAddr3);
+
+
+    //satisfied is true if there is no need to access the scratchpads
+    bool satisfied = false;
+    
+    //Atomic instruciton execution and reading flag 
+    bool atomicExec = false;
+    
+    if(pkt->isWrite()) { 
+        if (pkt->getVaddr() == configVertexStartAddr1) { 
+            vertexStartAddr1 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configVertexStartAddr2) { 
+            vertexStartAddr2 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configVertexStartAddr3) { 
+            vertexStartAddr3 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configVertexStartAddr4) { 
+            vertexStartAddr4 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configDataTypeSize1) { 
+            dataTypeSize1 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configDataTypeSize2) { 
+            dataTypeSize2 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configDataTypeSize3) { 
+            dataTypeSize3 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configDataTypeSize4) { 
+            dataTypeSize4 = (uint64_t)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configNumVertex) { 
+            numVertex = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configEnableTrackedAddr1) { 
+            enableTrackedAddr1 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configEnableTrackedAddr2) { 
+            enableTrackedAddr2 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configEnableTrackedAddr3) { 
+            enableTrackedAddr3 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configEnableTrackedAddr4) { 
+            enableTrackedAddr4 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configStride1) { 
+            stride1 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configStride2) { 
+            stride2 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configStride3) { 
+            stride3 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configStride4) { 
+            stride4 = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configEnablePrefetch) { 
+            enablePrefetch = (int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if (pkt->getVaddr() == configPrefetchAddr) { 
+            
+            if(enablePrefetch == 1) {
+                //Need to translate virtual to physical address
+                ctx = system->getThreadContext(pkt->req->contextId());
+    
+                //0x00000300 means valid size and data
+                //@todo change the constat size 8 
+                Addr vAddr = (uint64_t)*(pkt->getConstPtr<uint64_t>());
+                Request *req = new Request(0, vAddr, 8, 0x0000003,
+                        ctx->getCpuPtr()->cpuId(), 0x0, ctx->contextId(),
+                        ctx->threadId());
+                req->taskId(ctx->getCpuPtr()->taskId());
+
+                DPRINTF(RubySequencer, "TLB vaddr: %#x\n", vAddr);
+                // translate to physical address
+                Fault fault = ctx->getDTBPtr()->translateAtomic(req, ctx, BaseTLB::Write);
+                assert(fault == NoFault);
+                prefetchAddr = makeLineAddress(req->getPaddr()); 
+                DPRINTF(RubySequencer, "TLB paddr: %#x\n", prefetchAddr);
+                delete req;
+            }
+            satisfied = true;
+        }
+        else if ((pkt->getVaddr() == configPrefetchSize)) { 
+            //the incoming size is interms of number of edges 
+            //So it need to be converted into cache line 
+            //In addition, the prefetching need to start from after 64 bytes
+            //the edge data structure unless for weighted graph, then
+            //it should include the byts for the weights too
+            //@todo: change constants to be reconfigurable
+            int edgeDataTypeSize = 4; 
+            //prefetchSize = (((int)*(pkt->getConstPtr<uint64_t>()) - 64/edgeDataTypeSize)*edgeDataTypeSize)/64; 
+            prefetchSize = (((int)*(pkt->getConstPtr<uint64_t>()))*edgeDataTypeSize)/RubySystem::getBlockSizeBytes();
+           
+            //if prefetching is enabled, then continue to prefetch without early return
+            if(enablePrefetch !=1)
+                satisfied = true;
+        }
+
+        //For PISC implementation 
+        else if ((pkt->getVaddr() == configOldValueAddr1)) { 
+          atomicOldValue1 = (unsigned int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+            
+        }
+        else if ((pkt->getVaddr() == configOldValueAddr2)) { 
+            atomicOldValue2 = (unsigned int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if ((pkt->getVaddr() == configEnableAtomicAddr)) { 
+            enableAtomic = (unsigned int)*(pkt->getConstPtr<uint64_t>()); 
+            satisfied = true;
+        }
+        else if ((pkt->getVaddr() == configAtomicOppTyepAddr1)) { 
+            atomicOppType1 = (char)*(pkt->getConstPtr<uint8_t>()); 
+            satisfied = true;
+        }
+        else if ((pkt->getVaddr() == configAtomicOppTyepAddr2)) { 
+            atomicOppType2 = (char)*(pkt->getConstPtr<uint8_t>()); 
+            satisfied = true;
+        }
+        else if ((enableAtomic == 1) && (isVertexStartAddr(pkt))) {
+            if (isVertexInAddrRange(pkt, 1)) {
+                 atomicDataMapped1 = *(pkt->getConstPtr<uint64_t>());
+                 atomicDataMappedAddr1 = pkt->getVaddr();
+            }
+            else (isVertexInAddrRange(pkt, 2)) {
+                atomicDataMapped2 = *(pkt->getConstPtr<uint64_t>()); 
+                 atomicDataMappedAddr2 = pkt->getVaddr();
+            }
+            else {
+                panic("Invalid range of addresses mapped for atomic execution, check if more than two addresses are mapped"); 
+            }
+            
+            satisfied = true;
+ 
+        }
+        //Reusing the pkt to send atomic command to the scratchpads
+        //its vaddr and paddr are reset to the vertex address and will be 
+        //set to orignal addresses once the atomic instruction complete
+        else if ((pkt->getVaddr() == configAtomicStatusAddr1)) { 
+            //modify load packet: old value, new value, and type of atomic operation
+            
+            pkt->setAtomicNewValue(atomicDataMapped1); 
+            pkt->setAtomicMappedAddr(atomicDataMappedAddr1); 
+            pkt->setAtomicOppType(atomicOppType1); 
+            pkt->setAtomic(true);
+            pkt->setSetSpd(((atomicDataMappedAddr1 - vertexStartAddr1)/stride1); 
+            pkt->setOffsetSpd(0); 
+            pkt->setDestSpd(((atomicDataMappedAddr1 - vertexStartAddr1)/stride1) % m_numCPU); 
+
+            if (atomicOppTyp1 == 'c') { 
+                pkt->setAtomicOldValue(atomicOldValue1); 
+            } 
+                    
+            atomicExec = true;    
+        }
+        else if ((pkt->getVaddr() == configAtomicStatusAddr2)) { 
+            //modify load packet: old value, new value, and type of atomic operation
+             //modify load packet: old value, new value, and type of atomic operation
+            
+            pkt->setAtomicNewValue(atomicDataMapped2); 
+            pkt->setAtomicOppType(atomicOppType2; 
+            pkt->setAtomic(true);
+            pkt->setSetSpd(((atomicDataMappedAddr2 - vertexStartAddr2)/stride2); 
+            pkt->setOffsetSpd(1); 
+            pkt->setDestSpd(((atomicDataMappedAddr2 - vertexStartAddr2)/stride2) % m_numCPU); 
+
+            if (atomicOppTyp2 == 'c') { 
+                pkt->setAtomicOldValue(atomicOldValue2); 
+            }
+            atomicExec = true;    
+        } 
+    
+    // Abraham - adding vertex cache 
+    //@param satisfied = true when there is no need to access scratchpads
+    if (satisfied) {
+        return RequestStatus_Satisfied;
+    }
+    
+    if (m_outstanding_count >= m_max_outstanding_requests) {
+        return RequestStatus_BufferFull;
+    }
+
+    RubyRequestType primary_type = RubyRequestType_NULL;
+    RubyRequestType secondary_type = RubyRequestType_NULL;
+  
+
+    //@todo
+    //pass the atomicExec instruction without recording to the read and write reqeust table otherwise
+    //we need to check the address of the stored metadata instead of the current packet
+    //Adding atomic instruction execution 
+    if (atomicExec) {
+        if (isVertexLocal(pkt->getAtomicMappedAddr())) {
+            DPRINTF(RubySequencer, "Issuing atomic offloading instruction local\n");
+            primary_type = RubyRequestType_Locked_Vertex_Write_Local;
+            secondary_type = RubyRequestType_ST_Vertex_Local;
+        }
+        else {
+            DPRINTF(RubySequencer, "Issuing atomic offloading instruction remote\n");
+            primary_type = RubyRequestType_Locked_Vertex_Write_Remote;
+            secondary_type = RubyRequestType_ST_Vertex_Remote;
+        }
+   }
+    //Adding atomic instruction execution 
+    //if (pkt->isLLSC()) {
+    else if (pkt->isLLSC()) {
+
+
+   if (pkt->isLLSC()) {
+        //
+        // Alpha LL/SC instructions need to be handled carefully by the cache
+        // coherence protocol to ensure they follow the proper semantics. In
+        // particular, by identifying the operations as atomic, the protocol
+        // should understand that migratory sharing optimizations should not
+        // be performed (i.e. a load between the LL and SC should not steal
+        // away exclusive permission).
+        //
+        if (pkt->isWrite()) {
+            DPRINTF(RubySequencer, "Issuing SC\n");
+            primary_type = RubyRequestType_Store_Conditional;
+        } else {
+            DPRINTF(RubySequencer, "Issuing LL\n");
+            assert(pkt->isRead());
+            primary_type = RubyRequestType_Load_Linked;
+        }
+        secondary_type = RubyRequestType_ATOMIC;
+    } else if (pkt->req->isLockedRMW()) {
+        //
+        // x86 locked instructions are translated to store cache coherence
+        // requests because these requests should always be treated as read
+        // exclusive operations and should leverage any migratory sharing
+        // optimization built into the protocol.
+        //
+        if (pkt->isWrite()) {
+            DPRINTF(RubySequencer, "Issuing Locked RMW Write addr: %#x\n", pkt->getVaddr());
+            primary_type = RubyRequestType_Locked_RMW_Write;
+             
+            //Abraham - adding pkt type
+            if (isVertexStartAddr(pkt)) {
+                if (isVertexLocal(pkt)) {
+                    DPRINTF(RubySequencer, "Issuing Locked RMW Vertex Write Local\n");
+                    primary_type = RubyRequestType_Locked_Vertex_Write_Local;
+                    secondary_type = RubyRequestType_ST_Vertex_Local;
+                }
+                else {
+                    DPRINTF(RubySequencer, "Issuing Locked RMW Vertex Write Remote\n");
+                    primary_type = RubyRequestType_Locked_Vertex_Write_Remote;
+                    secondary_type = RubyRequestType_ST_Vertex_Remote;
+                }
+            }
+            
+        } else {
+            DPRINTF(RubySequencer, "Issuing Locked RMW Read addr: %#x\n", pkt->getVaddr());
+            assert(pkt->isRead());
+            primary_type = RubyRequestType_Locked_RMW_Read;
+       
+            //Abraham - adding pkt type
+            if (isVertexStartAddr(pkt)) {
+                
+                if (isVertexLocal(pkt)) {
+                    DPRINTF(RubySequencer, "Issuing Locked RMW Vertex Read Local\n");
+                    primary_type = RubyRequestType_Locked_Vertex_Read_Local;
+                    secondary_type = RubyRequestType_ST_Vertex_Local;
+                }
+                else {
+                    DPRINTF(RubySequencer, "Issuing Locked RMW Vertex Read Remote\n");
+                    primary_type = RubyRequestType_Locked_Vertex_Read_Remote;
+                    //This is different from the local because we writing inside ruby
+                    //and we need distinction
+                    secondary_type = RubyRequestType_Locked_LD_Vertex_Remote;
+                }
+            }
+        }
+        
+        if (!isVertexStartAddr(pkt)) 
+            secondary_type = RubyRequestType_ST;
+       /* 
+        //Abraham adding pkt type
+        if (isVertexStartAddr(pkt)) {
+            if (isVertexLocal(pkt))
+                //secondary_type = RubyRequestType_ST_Vertex_Local;
+                secondary_type = RubyRequestType_Locked_Vertex_Read_Local;
+            else
+                //secondary_type = RubyRequestType_ST_Vertex_Remote;
+                secondary_type = RubyRequestType_Locked_Vertex_Read_Remote;
+        }
+        */
+    } else {
+        if (pkt->isRead()) {
+            if (pkt->req->isInstFetch()) {
+                primary_type = secondary_type = RubyRequestType_IFETCH;
+                DPRINTF(RubySequencer, "Issuing Instruction Fetch addr: %#x\n", pkt->getVaddr());
+            } else {
+                bool storeCheck = false;
+                // only X86 need the store check
+                if (system->getArch() == Arch::X86ISA) {
+                    uint32_t flags = pkt->req->getFlags();
+                    storeCheck = flags &
+                        (X86ISA::StoreCheck << X86ISA::FlagShift);
+                }
+                if (storeCheck) {
+                    primary_type = RubyRequestType_RMW_Read;
+                    secondary_type = RubyRequestType_ST;
+                    
+                    //Abraham - adding pkt type
+                    if (isVertexStartAddr(pkt)) {
+                        panic("Issuing storecheck on vertex not handled\n");
+                       
+                       /* 
+                        if (isVertexLocal(pkt)) {
+                            primary_type = RubyRequestType_Locked_Vertex_Read_Local;
+                            secondary_type = RubyRequestType_ST_Vertex_Local;
+                        }
+                        else {
+                            primary_type = RubyRequestType_Locked_Vertex_Read_Remote;
+                            secondary_type = RubyRequestType_ST_Vertex_Remote;
+                        }
+                        */
+                    }
+                
+                } else {
+                    primary_type = secondary_type = RubyRequestType_LD;
+                    //Abraham adding pkt type
+                    DPRINTF(RubySequencer, "Issuing Read vaddr: %#x\n", pkt->getVaddr());
+                    if (isVertexStartAddr(pkt)) {
+                        DPRINTF(RubySequencer, "Issuing Vertex Read vaddr: %#x\n", pkt->getVaddr());
+                        
+                        DPRINTF(RubySequencer, "Thread Id: %#x numCPU: %#x \n", pkt->req->contextId(), m_numCPU);
+                        if (isVertexLocal(pkt)) {
+                            primary_type = secondary_type = RubyRequestType_LD_Vertex_Local;
+                            DPRINTF(RubySequencer, "Issuing Vertex Read local vaddr: %#x\n", pkt->getVaddr());
+                        }
+                        else
+                            primary_type = secondary_type = RubyRequestType_LD_Vertex_Remote;
+                    }
+                }
+            }
+        } else if (pkt->isWrite()) {
+            //
+            // Note: M5 packets do not differentiate ST from RMW_Write
+            //
+            primary_type = secondary_type = RubyRequestType_ST;
+            //Abraham adding pkt type
+            DPRINTF(RubySequencer, "Issuing Write vaddr: %#x\n", pkt->getVaddr());
+            
+            if (isEdgePrefetchSize(pkt)) {
+                DPRINTF(RubySequencer, "Issuing Edge Prefetching\n");
+                primary_type = secondary_type = RubyRequestType_PREFETCH_EDGE;
+                
+
+            }
+            else if (isVertexStartAddr(pkt)) {
+                DPRINTF(RubySequencer, "Issuing Vertex Write\n");
+                
+                if (isVertexLocal(pkt)) {
+                    DPRINTF(RubySequencer, "Issuing Vertex Write locally\n");
+                    primary_type = secondary_type = RubyRequestType_ST_Vertex_Local;
+                }
+                else {
+
+                    primary_type = secondary_type = RubyRequestType_ST_Vertex_Remote;
+                }
+            }
+        } else if (pkt->isFlush()) {
+          primary_type = secondary_type = RubyRequestType_FLUSH;
+        } else {
+            panic("Unsupported ruby packet type\n");
+        }
+    }
+
+    RequestStatus status = insertRequest(pkt, primary_type);
+    if (status != RequestStatus_Ready) 
+        return status;
+    issueRequest(pkt, secondary_type);
+
+    // TODO: issue hardware prefetches here
+    return RequestStatus_Issued;
+}
+
+bool
+Sequencer::isVertexInAddrRange(PacketPtr pkt, int addrRange) {
+
+    int numSpdSets = m_vertexCache_ptr->getNumSets();
+    int numLinesMapped = (numVertex > numSpdSets*m_numCPU) ? numSpdSets*m_numCPU : numVertex;
+    //DPRINTF(RubySequencer, "Details of spec. numVertex: %i numSpdSets: %i numLinesMapped: %i stride1: %i  stride2: %i dataTypesize1: %i dataTypesize2: %i dataTypeSize3: %i\n", 
+    //        numVertex, numSpdSets, numLinesMapped, stride1, stride2, dataTypeSize1, dataTypeSize2, dataTypeSize3);
+    //DPRINTF(RubySequencer, "Adddr current pkt: %#x stored addr1: %#x addr2 %#x addr3: %#x \n", pkt->getVaddr(), vertexStartAddr1, vertexStartAddr2, vertexStartAddr3);
+
+    if (addrRange == 1) 
+        return (((pkt->getVaddr() >= vertexStartAddr1) &&  (pkt->getVaddr() < 
+                (vertexStartAddr1 + stride1*numLinesMapped)) && 
+                ((pkt->getVaddr()-vertexStartAddr1)%stride1 == 0)));
+    else if (addrRange == 2) 
+        return (((pkt->getVaddr() >= vertexStartAddr2) &&  (pkt->getVaddr() < 
+                (vertexStartAddr2 + stride2*numLinesMapped)) && 
+                ((pkt->getVaddr()-vertexStartAddr2)%stride2 == 0)));
+    else if (addrRange == 3) 
+        return (((pkt->getVaddr() >= vertexStartAddr3) &&  (pkt->getVaddr() < 
+                (vertexStartAddr3 + stride3*numLinesMapped)) && 
+                ((pkt->getVaddr()-vertexStartAddr3)%stride3 == 0)));
+    
+    else if (addrRange == 4) 
+        return (((pkt->getVaddr() >= vertexStartAddr4) &&  (pkt->getVaddr() < 
+                (vertexStartAddr4 + stride4*numLinesMapped)) && 
+                ((pkt->getVaddr()-vertexStartAddr4)%stride4 == 0)));
+
+    else
+       panic("Invalid address range choice or no address was mapped to scratchpad");
+  
+  return false;
+   
+}
+
+bool
+Sequencer::isEdgePrefetchSize(PacketPtr pkt) {
+    if(pkt->getVaddr() == configPrefetchSize)
+        return true;
+   
+   return false;
+}
+
+bool
+Sequencer::isVertexStartAddr(PacketPtr pkt, Addr vAddr) 
+{
+    //DPRINTF(RubySequencer, "vertexADdrSize1 %#x Stored Start Address %#x New address %#x\n", dataTypeSize1,  vertexStartAddr1, vAddr);
+
+    if (enableTrackedAddr1 == 1) {
+        if (isVertexInAddrRange(pkt, 1)) {
+            pkt->setSetSpd((vAddr - vertexStartAddr1)/stride1); 
+            pkt->setOffsetSpd(0); 
+            pkt->setDestSpd(((vAddr - vertexStartAddr1)/stride1) % m_numCPU); 
+            
+            DPRINTF(RubySequencer, " Num addr 1, Is vertex cache address \n");
+            return true;
+        }
+    }
+    if (enableTrackedAddr2 == 1) {
+        if (isVertexInAddrRange(pkt, 2)) {
+            pkt->setSetSpd((vAddr  - vertexStartAddr2)/stride2); 
+            pkt->setOffsetSpd(1); 
+            pkt->setDestSpd(((vAddr - vertexStartAddr2)/stride2) % m_numCPU); 
+
+            DPRINTF(RubySequencer, " Num addr 2, Is vertex cache address \n");
+            return true;
+        }
+    }
+    if (enableTrackedAddr3 == 1) {
+        if (isVertexInAddrRange(pkt, 3)) { 
+            pkt->setSetSpd((vAddr  - vertexStartAddr3)/stride3); 
+            pkt->setOffsetSpd(2); 
+            pkt->setDestSpd(((vAddr  - vertexStartAddr3)/stride3) % m_numCPU); 
+
+            DPRINTF(RubySequencer, " Num addr 3, Is vertex cache address \n");
+            return true;
+        }
+    }
+    
+    if (enableTrackedAddr4 == 1) {
+        if (isVertexInAddrRange(pkt, 4)){ 
+            pkt->setSetSpd((vAddr - vertexStartAddr4)/stride4); 
+            pkt->setOffsetSpd(3); 
+            pkt->setDestSpd(((vAddr  - vertexStartAddr4)/stride4) % m_numCPU); 
+
+
+
+            DPRINTF(RubySequencer, " Num addr 4, Is vertex cache address \n");
+            return true;
+        }
+    }
+    
+    return false;
+}
+/*
+uint64_t
+Sequencer::determineSet(PacketPtr pkt)
+{
+    if (isVertexInAddrRange(pkt, 1)) 
+        return ((pkt->getVaddr() - vertexStartAddr1)/stride1); 
+    else if (isVertexInAddrRange(pkt, 2)) 
+        return ((pkt->getVaddr() - vertexStartAddr2)/stride2); 
+    else if (isVertexInAddrRange(pkt, 3)) 
+        return ((pkt->getVaddr() - vertexStartAddr3)/stride3);
+ 
+    else if (isVertexInAddrRange(pkt, 4)) 
+        return ((pkt->getVaddr() - vertexStartAddr4)/stride4);
+ 
+    return 0;
+}
+
+int
+Sequencer::determineOffset(PacketPtr pkt)
+{
+    if (isVertexInAddrRange(pkt, 1)) 
+        return 0; 
+    else if (isVertexInAddrRange(pkt, 2)) 
+        return 1;
+    else if (isVertexInAddrRange(pkt, 3)) 
+        return 2;
+ 
+    else if (isVertexInAddrRange(pkt, 4)) 
+        return 3;
+    
+    return 0;
+}
+
+int
+Sequencer::dest(PacketPtr pkt)
+{
+    if (isVertexInAddrRange(pkt, 1)) 
+        return (((pkt->getVaddr() - vertexStartAddr1)/stride1) % m_numCPU);
+    else if (isVertexInAddrRange(pkt, 2)) 
+        return (((pkt->getVaddr() - vertexStartAddr2)/stride2) % m_numCPU);
+    else if (isVertexInAddrRange(pkt, 3)) 
+        return (((pkt->getVaddr() - vertexStartAddr3)/stride3) % m_numCPU);
+    else if (isVertexInAddrRange(pkt, 4)) 
+        return (((pkt->getVaddr() - vertexStartAddr4)/stride4) % m_numCPU);
+   
+    return 0;  
+}
+*/
+
+bool
+Sequencer::isVertexLocal(PacketPtr pkt)
+{
+    
+    DPRINTF(RubySequencer, "IsVertexLocal vaddr:%x difference from start addr: %i numCPU: %i contextId: %i\n", pkt->getVaddr(), (pkt->getVaddr() - vertexStartAddr1), m_numCPU, pkt->req->contextId());
+    
+    if (isVertexInAddrRange(pkt, 1)) {
+        DPRINTF(RubySequencer, "pkt is in addre range 1\n");
+        if ((((pkt->getVaddr() - vertexStartAddr1)/stride1) % m_numCPU) == pkt->req->contextId())
+            return true;
+    }
+    else if (isVertexInAddrRange(pkt, 2)) {
+        if ((((pkt->getVaddr() - vertexStartAddr2)/stride2) % m_numCPU) == pkt->req->contextId())
+            return true;
+    }
+    else if (isVertexInAddrRange(pkt, 3)) {
+        if ((((pkt->getVaddr() - vertexStartAddr3)/stride3) % m_numCPU) == pkt->req->contextId())
+            return true;
+    }
+    else if (isVertexInAddrRange(pkt, 4)) {
+        if ((((pkt->getVaddr() - vertexStartAddr4)/stride4) % m_numCPU) == pkt->req->contextId())
+            return true;
+    }
+    else
+       panic("Invalid address range choice");
+ 
+    return false;
+
+}
+
+void
+Sequencer::issueRequest(PacketPtr pkt, RubyRequestType secondary_type)
+{
+    assert(pkt != NULL);
+    ContextID proc_id = pkt->req->hasContextId() ?
+        pkt->req->contextId() : InvalidContextID;
+
+    // If valid, copy the pc to the ruby request
+    Addr pc = 0;
+    if (pkt->req->hasPC()) {
+        pc = pkt->req->getPC();
+    }
+
+    bool isVertex = false;
+    //Abraham - line address and physical address are the same if vertex
+    if((secondary_type == RubyRequestType_ST_Vertex_Local) ||
+        (secondary_type == RubyRequestType_ST_Vertex_Remote) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Read_Remote) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Write_Remote) ||
+        (secondary_type == RubyRequestType_PREFETCH_EDGE) ||
+        (secondary_type == RubyRequestType_LD_Vertex_Local) ||
+        (secondary_type == RubyRequestType_LD_Vertex_Remote)) {
+ 
+        isVertex = true; 
+    }
+    // check if the packet has data as for example prefetch and flush
+    // requests do not
+    std::shared_ptr<RubyRequest> msg =
+        std::make_shared<RubyRequest>(clockEdge(), pkt->getAddr(),
+                                      prefetchAddr, 
+                                      prefetchSize, 
+                                      isVertex,
+                                      pkt->getDestSpd(), 
+                                      pkt->getSetSpd(),
+                                      pkt->getOffsetSpd(),
+                                      pkt->isFlush() ?
+                                      nullptr : pkt->getPtr<uint8_t>(),
+                                      pkt->getSize(), pc, secondary_type,
+                                      RubyAccessMode_Supervisor, pkt,
+                                      PrefetchBit_No, proc_id);
+
+    DPRINTFR(ProtocolTrace, "%15s %3s %10s%20s %6s>%-6s %#x %s\n",
+            curTick(), m_version, "Seq", "Begin", "", "",
+            printAddress(msg->getPhysicalAddress()),
+            RubyRequestType_to_string(secondary_type));
+
+    // The Sequencer currently assesses instruction and data cache hit latency
+    // for the top-level caches at the beginning of a memory access.
+    // TODO: Eventually, this latency should be moved to represent the actual
+    // cache access latency portion of the memory access. This will require
+    // changing cache controller protocol files to assess the latency on the
+    // access response path.
+    Cycles latency(0);  // Initialize to zero to catch misconfigured latency
+
+    //Abraham - adding priority to message: vertex access has lower priority than non-vertex
+    //0 - high priority, 1 - low priority
+    //not used for the time being
+    int prio = 0;
+    if (secondary_type == RubyRequestType_IFETCH)
+        latency = m_inst_cache_hit_latency;
+    else
+        latency = m_data_cache_hit_latency;
+
+
+     if((secondary_type == RubyRequestType_ST_Vertex_Local) ||
+        (secondary_type == RubyRequestType_ST_Vertex_Remote) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Read_Local) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Read_Remote) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Write_Local) ||
+        (secondary_type == RubyRequestType_Locked_Vertex_Write_Remote) ||
+        (secondary_type == RubyRequestType_PREFETCH_EDGE) ||
+        (secondary_type == RubyRequestType_LD_Vertex_Local) ||
+        (secondary_type == RubyRequestType_LD_Vertex_Remote)) {
+        
+        latency = m_vertex_cache_hit_latency;
+        prio = 0 ;
+    }
+    
+    // Send the message to the cache controller
+    assert(latency > 0);
+
+    assert(m_mandatory_q_ptr != NULL);
+    m_mandatory_q_ptr->enqueue(msg, clockEdge(), cyclesToTicks(latency), prio);
+}
+
+template <class KEY, class VALUE>
+std::ostream &
+operator<<(ostream &out, const std::unordered_map<KEY, VALUE> &map)
+{
+    auto i = map.begin();
+    auto end = map.end();
+
+    out << "[";
+    for (; i != end; ++i)
+        out << " " << i->first << "=" << i->second;
+    out << " ]";
+
+    return out;
+}
+
+void
+Sequencer::print(ostream& out) const
+{
+    out << "[Sequencer: " << m_version
+        << ", outstanding requests: " << m_outstanding_count
+        << ", read request table: " << m_readRequestTable
+        << ", write request table: " << m_writeRequestTable
+        << "]";
+}
+
+// this can be called from setState whenever coherence permissions are
+// upgraded when invoked, coherence violations will be checked for the
+// given block
+void
+Sequencer::checkCoherence(Addr addr)
+{
+#ifdef CHECK_COHERENCE
+    m_ruby_system->checkGlobalCoherenceInvariant(addr);
+#endif
+}
+
+void
+Sequencer::recordRequestType(SequencerRequestType requestType) {
+    DPRINTF(RubyStats, "Recorded statistic: %s\n",
+            SequencerRequestType_to_string(requestType));
+}
+
+
+void
+Sequencer::evictionCallback(Addr address)
+{
+    ruby_eviction_callback(address);
+}
+
+void
+Sequencer::regStats()
+{
+    m_store_waiting_on_load
+        .name(name() + ".store_waiting_on_load")
+        .desc("Number of times a store aliased with a pending load")
+        .flags(Stats::nozero);
+    m_store_waiting_on_store
+        .name(name() + ".store_waiting_on_store")
+        .desc("Number of times a store aliased with a pending store")
+        .flags(Stats::nozero);
+    m_load_waiting_on_load
+        .name(name() + ".load_waiting_on_load")
+        .desc("Number of times a load aliased with a pending load")
+        .flags(Stats::nozero);
+    m_load_waiting_on_store
+        .name(name() + ".load_waiting_on_store")
+        .desc("Number of times a load aliased with a pending store")
+        .flags(Stats::nozero);
+
+    // These statistical variables are not for display.
+    // The profiler will collate these across different
+    // sequencers and display those collated statistics.
+    m_outstandReqHist.init(10);
+    m_latencyHist.init(10);
+    m_hitLatencyHist.init(10);
+    m_missLatencyHist.init(10);
+
+    for (int i = 0; i < RubyRequestType_NUM; i++) {
+        m_typeLatencyHist.push_back(new Stats::Histogram());
+        m_typeLatencyHist[i]->init(10);
+
+        m_hitTypeLatencyHist.push_back(new Stats::Histogram());
+        m_hitTypeLatencyHist[i]->init(10);
+
+        m_missTypeLatencyHist.push_back(new Stats::Histogram());
+        m_missTypeLatencyHist[i]->init(10);
+    }
+
+    for (int i = 0; i < MachineType_NUM; i++) {
+        m_hitMachLatencyHist.push_back(new Stats::Histogram());
+        m_hitMachLatencyHist[i]->init(10);
+
+        m_missMachLatencyHist.push_back(new Stats::Histogram());
+        m_missMachLatencyHist[i]->init(10);
+
+        m_IssueToInitialDelayHist.push_back(new Stats::Histogram());
+        m_IssueToInitialDelayHist[i]->init(10);
+
+        m_InitialToForwardDelayHist.push_back(new Stats::Histogram());
+        m_InitialToForwardDelayHist[i]->init(10);
+
+        m_ForwardToFirstResponseDelayHist.push_back(new Stats::Histogram());
+        m_ForwardToFirstResponseDelayHist[i]->init(10);
+
+        m_FirstResponseToCompletionDelayHist.push_back(new Stats::Histogram());
+        m_FirstResponseToCompletionDelayHist[i]->init(10);
+    }
+
+    for (int i = 0; i < RubyRequestType_NUM; i++) {
+        m_hitTypeMachLatencyHist.push_back(std::vector<Stats::Histogram *>());
+        m_missTypeMachLatencyHist.push_back(std::vector<Stats::Histogram *>());
+
+        for (int j = 0; j < MachineType_NUM; j++) {
+            m_hitTypeMachLatencyHist[i].push_back(new Stats::Histogram());
+            m_hitTypeMachLatencyHist[i][j]->init(10);
+
+            m_missTypeMachLatencyHist[i].push_back(new Stats::Histogram());
+            m_missTypeMachLatencyHist[i][j]->init(10);
+        }
+    }
+}

@@ -1,5 +1,6 @@
 # Graph Reordering #
-This readme provides how to use and run different reordering methods, test reordering methods, and how to run simulations on those reordered graphs.
+Graph Reordering improves the locality of Graph processing. It systematically reassigns Vertex ID of the nodes in the graph to increase the cache hit rate based on different heuristics and graph structure properties, like power-law distribution property, degrees, clusters, and symmetricity of real-world graphs. 
+Provided below is how to use and run different reordering methods, test reordering methods, and how to run simulations on those reordered graphs.
 ## These Reordering methods include: ##
 - Degree reordering
 - Clustering
